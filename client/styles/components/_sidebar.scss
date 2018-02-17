@@ -1,0 +1,47 @@
+.ag-sidebar {
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+  min-height: 100%;
+  min-height: 100vh;
+  background: $SIDEBAR_BG;
+  color: $GRAY_1;
+  font-weight: 300;
+
+  &--list {
+    height: 40%;
+    overflow-y: scroll;
+    height: 40vh;
+    outline: 3px solid $GRAY_2;
+  }
+  &--label {
+    display: block;
+  }
+  &--title {
+    margin-top: 5px;
+  }
+  &--filter-type {
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: $GRAY_3;
+  }
+  &--filter-filter {
+    padding: 5px;
+  }
+  &--legend {
+    border-top: 4px solid $GRAY_3;
+  }
+  &--legend-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    border-radius: 10px;
+    border: 1px solid $GRAY_2;
+  }
+  &--legend-elem {
+    margin-right: 10px;
+    display: inline-block;
+  }
+}

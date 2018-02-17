@@ -1,0 +1,77 @@
+.ag-cluster {
+  &--container {
+    width: 100%;
+    position: relative;
+    vertical-align: top;
+    top: 0;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  &--section {
+    vertical-align: top;
+    background-color: $WHITE;
+    box-sizing: border-box;
+    border: 2px solid $GRAY_3;
+    overflow: initial;
+  }
+  &--section-content {
+    overflow: initial;
+  }
+  &--row-second .ag-cluster--section {
+    min-height: 54px;
+    max-height: 12vh;
+    display: inline-block;
+    width: 50%;
+  }
+  &--row-first .ag-cluster--section {
+    min-height: 100px;
+    max-height: 12vh;
+    margin-bottom: 10px;
+  }
+  &--selectors {
+    padding-bottom: 10px;
+    z-index: 3;
+    position: relative;
+  }
+  &--selector {
+    width: 50%;
+    display: inline-block;
+    vertical-align: top;
+  }
+  &--element {
+    display: inline-block;
+    margin: 2px;
+    background: $GRAY_3;
+    position: relative;
+    cursor: pointer;
+  }
+  &--element-data {
+    z-index: 2;
+    position: relative;
+    text-align: center;
+    width: 100%;
+  }
+  &--brush {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: $ORANGE_1;
+    z-index: 0;
+  }
+  &--nodata {
+
+  }
+  &--active-example {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    display: inline-block;
+    background-color: $GRAY_4;
+  }
+  &--element {
+    position: relative;
+    overflow: initial;
+  }
+}

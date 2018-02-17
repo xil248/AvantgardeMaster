@@ -1,0 +1,16 @@
+.ag-tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  background-color: $WHITE;
+  box-shadow: 0 2px 2px $GRAY_4;
+  padding: 4px;
+  width: auto;
+
+  &--position-top {
+    top: -50px;
+  }
+  &--position-bottom {
+    bottom: -50px;
+  }
+}

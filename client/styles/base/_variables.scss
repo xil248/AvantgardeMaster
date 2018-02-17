@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400');
+
+// Constant colors
+$WHITE: #FFFFFF;
+
+// Mid-dark gray, for text and UI elements
+$GRAY_1: #323645;
+
+$GRAY_2: #9898A0;
+
+// SUPERLIGHT gray, for backgrounds
+$GRAY_3: #EEEEEE;
+
+$GRAY_4: #CCCCCC;
+
+// BLUE
+$BLUE_1: #2E4A57;
+
+$BLUE_2: lighten($BLUE_1, 20%);
+
+$PURPLE_1: #443978;
+
+$ORANGE_1: #FF9867;
+
+$BLUE_PURPLE_GRADIENT: linear-gradient(135deg, #556ac8 0%, #3d2754 100%);
+
+$SIDEBAR_BG: $WHITE;
+
+$FONT_FAMILY: 'Source Sans Pro', sans-serif;

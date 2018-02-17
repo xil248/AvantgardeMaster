@@ -1,0 +1,37 @@
+.ag-main--container {
+  width: 83%;
+  display: inline-block;
+  // margin-left: 10px;
+  padding-top: 30px;
+}
+
+.ag-chart {
+  &--container {
+    overflow-y: scroll;
+  }
+  &--barchart {
+    display: inline-block;
+    margin: 0px;
+  }
+  &--tooltip-container {
+    position: relative;
+  }
+  &--tooltip {
+    position: absolute;
+    z-index: 3;
+    text-align: center;
+  }
+}
+
+.ag-graph--row {
+  background: white;
+  padding: 5px;
+  margin: 5px 20px;
+  position: relative;
+
+  &-close-button {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+  }
+}

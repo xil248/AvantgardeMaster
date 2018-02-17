@@ -1,0 +1,105 @@
+.ag-filter {
+  padding: 4px;
+
+  &--confidence-wrapper {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    margin: 5px;
+    vertical-align: middle;
+    display: inline-block;
+    border-radius: 10px;
+    border: 1px solid $GRAY_2;
+  }
+  &--confidence {
+    border-radius: 10px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+  }
+  &--title {
+    padding-top: 10px;
+    margin-top: 0;
+  }
+  &--dropdown {
+    background-color: white;
+    z-index: 3;
+    position: relative;
+    background-color: $GRAY_3;
+
+    h3 {
+      margin-top: 0;
+    }
+  }
+  &--list-element {
+    padding: 0;
+  }
+  &--list-bar {
+    color: $GRAY_1;
+    padding: 4px 0;
+    margin-right: 10px;
+    cursor: pointer;
+    display: block;
+
+    &:hover {
+      background-color: $GRAY_3;
+      text-decoration: none;
+    }
+  }
+  &--background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    z-index: 2;
+  }
+  &--icon {
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    position: relative;
+    top: 4px;
+    left: -4px;
+    background: none;
+    border: none;
+    float: right;
+    font-size: 20px;
+    line-height: 20px;
+  }
+  &--checkboxes {
+    li {
+      padding: 4px 0;
+    }
+  }
+}
+
+.ag-input {
+  &--list {
+    border-bottom: none;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      text-decoration: none;
+      border-top: 1px solid $GRAY_2;
+
+      &:last-of-type {
+        border-bottom: 1px solid $GRAY_2;
+      }
+    }
+    label {
+      display: inline-block;
+      line-height: 16px;
+      margin-bottom: 0;
+      vertical-align: middle;
+
+      input[type='checkbox'] {
+        margin-top: 5px;
+        margin-right: 5px;
+      }
+    }
+  }
+}

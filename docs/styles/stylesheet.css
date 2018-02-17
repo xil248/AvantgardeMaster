@@ -1,0 +1,71 @@
+body {
+  background-color: #EEE;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.container {
+  background-color: white;
+}
+
+.navbar {
+  background-color: white;
+  padding: 10px 0;
+}
+
+.card {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.card-img {
+  background-color: #EEE;
+  height: 300px;
+}
+
+.screenshot-container {
+  display: flex;
+  justify-content: center;
+}
+
+.screenshot {
+  width: 700px;
+  height: auto;
+  margin: 50px auto;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+}
+
+#card-img-weibel {
+  background: url('../images/nadir-weibel.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+#card-img-sarvghad {
+  background: url('../images/ali-sarvghad.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+#card-img-sequeira {
+  background: url('../images/joel-sequeira.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+#card-img-liaw {
+  background: url('../images/vincent-liaw.jpg') no-repeat center 0;
+  background-size: cover;
+}
+
+#card-img-mehta {
+  background: url('../images/sanjay-mehta.jpg') no-repeat center 0;
+  background-size: cover;
+}
+
+#card-img-smith {
+  background: url('../images/davey-smith.jpg') no-repeat center center;
+  background-size: cover;
+}

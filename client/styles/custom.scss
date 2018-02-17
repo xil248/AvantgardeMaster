@@ -1,0 +1,43 @@
+// Overrides
+.ag-body {
+  display: inline-block;
+  min-height: 100vh;
+  vertical-align: top;
+  width: 69%;
+  max-width: 69vw;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 5px;
+  text-align: center;
+}
+
+/* Bootstrap overrides */
+.btn {
+  border-radius: 0;
+  color: $WHITE;
+  background: $BLUE_PURPLE_GRADIENT;
+  // background: $GRAY_2;
+  border: none;
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: $BLUE_PURPLE_GRADIENT;
+    // background: $GRAY_2;
+    color: $WHITE;
+  }
+}
+.clearfix:before,
+.clearfix:after {
+    content: ".";    
+    display: block;    
+    height: 0;    
+    overflow: hidden; 
+}
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; } /* IE < 8 */

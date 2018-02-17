@@ -1,0 +1,10 @@
+.ag-input {
+  &--numeric-wrapper {
+    width: 50%;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+  &--numeric-label {
+    position: static !important;
+  }
+}
