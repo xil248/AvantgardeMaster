@@ -35,7 +35,7 @@ import merge from 'lodash.merge';
 
 const dateParser = {};
 
-const colorScale = scale.category20();
+// const colorScale = scale.category20();
 
 export default class BarChart extends React.Component {
 

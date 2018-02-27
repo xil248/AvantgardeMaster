@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import {
-  // FILTER_CATEGORICAL,
+  FILTER_CATEGORICAL,
   FILTER_CONTINUOUS,
   // FILTER_BUCKETED,
 } from '../../filtering/filterTypes';
+import BarChart2 from './BarChart2';
 import BarChart1 from './BarChart1';
 import Confidence from '../Filters/Confidence';
 import * as actions from '../../actions/index';
@@ -16,7 +17,7 @@ const propTypes = {
   /**
    * The data to display from GraphContainer
    */
-  // data: PropTypes.array,
+  data: PropTypes.array,
 
   /**
    * Object containing the features to display coming
@@ -139,11 +140,6 @@ class Graphs extends React.Component {
   //   }
   // }
 
-
-  componentDidUpdate() {
-    const end = new Date().getTime();
-    console.log(end, this.start);
-  }
   /**
    * Function to render Graphs for each feature
    * in the Redux state using the data from Redux
@@ -156,18 +152,90 @@ class Graphs extends React.Component {
       .filter(feature => this.props.features[feature])
       .map((feature) => {
         // Get the type of the filter
+        console.log(`start ${performance.now()}`);
         const type = DataUtils.getFilterType(feature);
 
         // Get all the attributes for this particular feature (datatype: SET)
-        // const attribs = DataUtils.getFeatureAttributes(feature);
+        const attribs = DataUtils.getFeatureAttributes(feature);
 
-        // let valuesKeys = [...attribs];
-
+        let valuesKeys = [...attribs];
+        console.log(`continue ${performance.now()}`);
         switch (type) {
-          // case FILTER_CATEGORICAL:
+          case FILTER_CATEGORICAL: {
+            /**
+             * Build the values object that will be used to create the data for
+             * the chart. The keys for it will be the attributes of the feature
+             * and the value for each key will be its count in the data set
+             * eg. for Sex {
+             *  'Male': 500,
+             *  'Female': 200,
+             *  'Trans': 50,
+             * };
+             */
+            valuesKeys = valuesKeys.filter(value => value.trim());
+            const values = {};
+            this.props.data.forEach((elem) => {
+              const currElemFeatureValue = elem[feature];
+              values[currElemFeatureValue] = values[currElemFeatureValue] ? values[currElemFeatureValue] + 1 : 1;
+            });
+
+            /**
+             * Data to pass into chart needs to look like:
+             * [
+             *   { x: 'Male', y: 500 },
+             *   { x: 'Female', y: 200 },
+             *   { x: 'Trans', y: 100 },
+             * ]
+             */
+            const data = valuesKeys.reduce((acc, curr) => {
+              return [
+                ...acc,
+                {
+                  x: curr,
+                  y: parseFloat(values[curr] || 0),
+                },
+              ];
+            }, []);
+
+            // let brushedData = [];
+
+            // if (this.props.brush) {
+            //   const brushedValues = {};
+            //   this.props.brushedData.forEach((elem) => {
+            //     const currElemFeatureValue = elem[feature];
+            //     brushedValues[currElemFeatureValue] = brushedValues[currElemFeatureValue] ?
+            //       brushedValues[currElemFeatureValue] + 1
+            //       : 1;
+            //   });
+
+            //   brushedData = valuesKeys.reduce((acc, curr) => {
+            //     return [
+            //       ...acc,
+            //       {
+            //         x: curr,
+            //         y: parseFloat(brushedValues[curr] || 0),
+            //       },
+            //     ];
+            //   }, []);
+            // }
+
+            return (
+              <div key={feature} className="ag-chart--barchart">
+                <BarChart2
+                  data={data}
+                  width={200}
+                  // mouseOutHandler={this.mouseOutHandler}
+                  // mouseOverHandler={(d, e) => this.mouseOverHandler(d, e, feature, type)}
+                />
+                <div className="ag-chart--barchart-title text-center">
+                  <Confidence feature={feature} position={'top'} />
+                  {feature}
+                </div>
+              </div>
+            );
+          }
           // case FILTER_BUCKETED:
           case FILTER_CONTINUOUS: {
-            this.start = new Date().getTime();
             return (
               <div key={feature} className="ag-chart--barchart">
                 <BarChart1
@@ -190,12 +258,13 @@ class Graphs extends React.Component {
   }
 
   render() {
-    const { ttTop, ttLeft, showToolTip, ttWidth } = this.state;
+    // const { ttTop, ttLeft, showToolTip, ttWidth } = this.state;
     // console.log(ttTop, ttLeft, ttWidth);
+    console.log(`start render graph ${performance.now()}`);
     return (
       <div className="ag-chart--container">
         <div className="ag-chart--tooltip-container">
-          {showToolTip &&
+          {/* {showToolTip &&
             <div
               className="ag-chart--tooltip"
               style={{
@@ -204,9 +273,8 @@ class Graphs extends React.Component {
                 width: ttWidth,
               }}
             >
-              aaaaaa
             </div>
-          }
+          } */}
         </div>
         {this.renderGraphs()}
       </div>

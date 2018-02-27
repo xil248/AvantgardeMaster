@@ -48,13 +48,18 @@ class BarChart1 extends React.Component {
   }
 
   componentWillMount() {
-    // const faux = this.props.connectFauxDOM('div', 'chart');
+    console.log(`start render ${performance.now()}`);
     const {
       data,
       label,
     } = this.props;
     const bins = new GradBins(data, label);
     this.createChart(bins);
+  }
+
+  componentDidMount() {
+    console.log(`end render ${performance.now()}`);
+    this.forceUpdate();
   }
 
   componentWillUnmount() {
