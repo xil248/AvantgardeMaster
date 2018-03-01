@@ -231,7 +231,7 @@ class BarChart2 extends React.Component {
       .style('fill', '#3690c0')
       .style('stroke', 'black')
       // .on('click', this.RectClick.bind(this))
-      // .on('mouseout', this.RectMouseOut);
+      .on('mouseover', (d, i) => { this.i = i; })
       .call(d3.drag()
         .on('start', this.RectClick.bind(this))
         .on('drag', this.RectDrag.bind(this))
@@ -315,7 +315,7 @@ class BarChart2 extends React.Component {
   }
 
   BarMouseOver(d, i) {
-    this.chart.select(`.${i}`).selectAll('rect')
+    this.chart.select(`.${i}`).selectAll(`.rect${this.i}`)
       .style('fill', '#95745b');
     this.createTip(d, i);
     this.forceUpdate();
@@ -329,6 +329,8 @@ class BarChart2 extends React.Component {
 
     this.forceUpdate();
   }
+
+
   // RL
   RectClick(d, i, e) {
     // d3.event.sourceEvent.preventDefault();
@@ -342,16 +344,36 @@ class BarChart2 extends React.Component {
     console.log(e);
     this.rectx = parseFloat(this.dragRect.attr('x'));
     this.recty = isNaN(this.dragRect.attr('y')) ? 0 : parseFloat(this.dragRect.attr('y'));
+    this.deter = true;
   }
   // LL
   RectDrag() {
+    d3.event.sourceEvent.preventDefault();
     // calculate mouse move
     const dx = d3.event.sourceEvent.x - this.currentX;
+    const dy = d3.event.sourceEvent.y - this.currentY;
     // const dy = d3.event.sourceEvent.y - this.currentY;
     // change selection
 
-    this.dragRect.attr('x', this.rectx + dx);
-    this.moveTip(dx);
+    if (this.deter) {
+      if (Math.abs(dy) > 0.1 * Math.abs(dx)) {
+        this.mode = 'v';
+      } else {
+        this.mode = 'h';
+      }
+      console.log(dy, dx);
+      if (dy !== 0 || dx !== 0) {
+        this.deter = false;
+      }
+    }
+
+    if (this.mode === 'v') {
+      this.dragRect.attr('y', this.recty + dy);
+    } else {
+      this.dragRect.attr('x', this.rectx + dx);
+      this.moveTip(dx);
+    }
+
       // .attr('y', this.recty + dy);
     this.forceUpdate();
   }
@@ -363,53 +385,92 @@ class BarChart2 extends React.Component {
 
     this.dragRect.attr('x', this.rectx);
     this.dragRect.attr('y', this.recty);
-    for (let j = 0; j < this.rectX.length; j += 1) {
-      if (x > this.rectX[j] - (1.5 * this.length) && x < this.rectX[j] + (0.5 * this.length)) {
-        const arr = this.bins[prej];
-        const stack = [];
-    //     // console.log(this.where, this.which);
 
-        // delete d
-        const arrLength = arr.length;
-        for (let k = 0; k < arrLength; k += 1) {
-          const e = arr.pop();
-          stack.push(e);
+    if (this.mode === 'h') {
+      for (let j = 0; j < this.rectX.length; j += 1) {
+        if (x > this.rectX[j] - (1.5 * this.length) && x < this.rectX[j] + (0.5 * this.length)) {
+          const arr = this.bins[prej];
+          const stack = [];
 
-          // pop from stack and add to arr
-          if (e === d) {
-            stack.pop();
+          // delete d
+          const arrLength = arr.length;
+          for (let k = 0; k < arrLength; k += 1) {
+            const e = arr.pop();
+            stack.push(e);
 
-            const stackLength = stack.length;
-            for (let l = 0; l < stackLength; l += 1) {
-              const e1 = stack.pop();
-              arr.push(e1);
+            // pop from stack and add to arr
+            if (e === d) {
+              stack.pop();
+
+              const stackLength = stack.length;
+              for (let l = 0; l < stackLength; l += 1) {
+                const e1 = stack.pop();
+                arr.push(e1);
+              }
+              console.log(arr);
+              break;
             }
-            break;
           }
+
+          // add d
+
+          this.bins[j].push(d);
+
+          const newBin = [];
+          this.bins.forEach((e) => {
+            if (e.length > 0) {
+              newBin.push(e);
+            }
+          });
+          this.bins = newBin;
+          console.log(this.bins);
+          // update graph
+          this.createChart();
+          break;
+          // // move tag
+          // const tag = d3.select(this.dragRect.node().parentNode).select('text');
+          // this.dragRect.attr('x', this.rectX[j] - (this.length / 2) - this.rectX[i]);
+          // tag.remove();
         }
-
-        // console.log(j, prej);
-
-        // add d
-        this.bins[j].push(d);
-        console.log(this.bins);
-        // update graph
-        this.createChart();
-
-        // // move tag
-        // const tag = d3.select(this.dragRect.node().parentNode).select('text');
-        // this.dragRect.attr('x', this.rectX[j] - (this.length / 2) - this.rectX[i]);
-        // tag.remove();
+      // }
       }
-    // }
-
 
       // y
-    }
+    } else {
+      const arr = this.bins[prej];
+      const stack = [];
 
-    // if (!update) {
-    //   this.dragRect.attr('height', this.recty);
-    // }
+      // delete d
+      const arrLength = arr.length;
+      for (let k = 0; k < arrLength; k += 1) {
+        const e = arr.pop();
+        stack.push(e);
+
+        // pop from stack and add to arr
+        if (e === d) {
+          stack.pop();
+
+          const stackLength = stack.length;
+          for (let l = 0; l < stackLength; l += 1) {
+            const e1 = stack.pop();
+            arr.push(e1);
+          }
+          console.log(arr);
+          break;
+        }
+      }
+      this.bins.push([d]);
+      const newBin = [];
+      this.bins.forEach((e) => {
+        if (e.length > 0) {
+          newBin.push(e);
+        }
+      });
+      this.bins = newBin;
+      console.log(this.bins);
+      // update graph
+      this.createChart();
+    }
     this.forceUpdate();
   }
 
