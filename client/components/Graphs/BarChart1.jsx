@@ -11,6 +11,7 @@ import {
 import {
   gradBins as GradBins,
 } from './BarChart/model/gradBins';
+import DataUtils from '../../utils/dataUtils';
 
 
 // const DragSelect = require('dragselect');
@@ -23,7 +24,7 @@ class BarChart1 extends React.Component {
 
   static get propTypes() {
     return {
-      data: PropTypes.array.isRequired,
+      // data: PropTypes.array.isRequired,
       label: PropTypes.string.isRequired,
       // rectWidth: PropTypes.number,
       // change: PropTypes.bool,
@@ -50,10 +51,10 @@ class BarChart1 extends React.Component {
   componentWillMount() {
     console.log(`start render ${performance.now()}`);
     const {
-      data,
       label,
     } = this.props;
-    const bins = new GradBins(data, label);
+    console.log(DataUtils.data);
+    const bins = new GradBins(DataUtils.data, label);
     this.createChart(bins);
   }
 

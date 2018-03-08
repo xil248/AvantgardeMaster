@@ -7,11 +7,15 @@ import {
   FILTER_CONTINUOUS,
   // FILTER_BUCKETED,
 } from '../../filtering/filterTypes';
+// import BarChart3 from './BarChart3';
 import BarChart2 from './BarChart2';
 import BarChart1 from './BarChart1';
 import Confidence from '../Filters/Confidence';
 import * as actions from '../../actions/index';
 import DataUtils from '../../utils/dataUtils';
+// import {
+//   gradBins as GradBins,
+// } from './BarChart/model/gradBins';
 
 const propTypes = {
   /**
@@ -239,7 +243,7 @@ class Graphs extends React.Component {
             return (
               <div key={feature} className="ag-chart--barchart">
                 <BarChart1
-                  data={DataUtils.data}
+                  // bins={bins}
                   label={feature}
                   width={200}
                 />
@@ -260,7 +264,7 @@ class Graphs extends React.Component {
   render() {
     // const { ttTop, ttLeft, showToolTip, ttWidth } = this.state;
     // console.log(ttTop, ttLeft, ttWidth);
-    console.log(`start render graph ${performance.now()}`);
+    // console.log(`start render graph ${performance.now()}`);
     return (
       <div className="ag-chart--container">
         <div className="ag-chart--tooltip-container">
