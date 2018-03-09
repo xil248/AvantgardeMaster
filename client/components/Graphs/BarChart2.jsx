@@ -327,7 +327,15 @@ class BarChart2 extends React.Component {
   }
 
   createAdaptRect(e) {
-    this.adaptRect = d3.select(e.parentNode).insert('g', ':first-child');
+    // console.log(parseInt(e.props.className, 10));
+    this.adaptRect = d3.select(e.parentNode).insert('g', ':first-child')
+      .attr('class', `${e.props.className.match(/\d+/)[0]}adapt`)
+      .style('cursor', this.forbidV ? 'ew-resize' : 'move')
+      .call(d3.drag()
+        .on('start', this.AdaptRectClick.bind(this))
+        .on('drag', this.RectDrag.bind(this))
+        .on('end', this.RectDrop.bind(this))
+      );
     this.adaptRect.append('rect')
       .attr('x', -this.length / 2)
       .attr('y', -this.adaptHeight)
@@ -385,6 +393,33 @@ class BarChart2 extends React.Component {
     });
   }
 
+  AdaptRectClick(d, i, e) {
+    console.log(e[i].props.className);
+    this.className = `rect${parseInt(e[i].props.className, 10)}`;
+    const dragRect = this.chart.select(this.className);
+    // mouse x, y position
+    this.currentX = d3.event.sourceEvent.x;
+    this.currentY = d3.event.sourceEvent.y;
+
+    // if (this.adaptRect !== undefined && this.adaptRect !== null) {
+    //   this.adaptRect.remove();
+    //   this.adaptRect = null;
+    // }
+    // const height = parseInt(dragRect.attr('height'), 10);
+    // if (height < this.adaptHeight) {
+    //   this.createAdaptRect(e[i]);
+    // }
+    // if (this.adaptRect !== undefined && this.adaptRect !== null) {
+    //   this.adaptX = parseFloat(this.adaptRect.attr('x'));
+    //   this.adaptY = parseFloat(this.adaptRect.attr('y'));
+    // }
+
+    // determine whether h or v
+    this.deter = true;
+    dragRect.on('mouseout', null);
+
+    this.forceUpdate();
+  }
   RectSolidClick(d, i, e) {
     this.forbidV = e.length === 1 && this.forbidV;
 
