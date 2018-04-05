@@ -1,5 +1,6 @@
 // For Features
 export const ADD_FEATURE = 'ADD_FEATURE';
+export const LOAD_ALL_FEATURES = 'LOAD_ALL_FEATURES';
 export const REMOVE_FEATURE = 'REMOVE_FEATURE';
 export const INIT_FILTERS = 'INIT_FILTERS';
 export const UPDATE_FILTERS = 'UPDATE_FILTERS';
@@ -13,3 +14,4 @@ export const CHANGE_CLUSTER_FEATURE = 'CHANGE_CLUSTER_FEATURE';
 export const CHANGE_STARTYEAR = 'CHANGE_STARTYEAR';
 export const CHANGE_ENDYEAR = 'CHANGE_ENDYEAR';
 export const TOGGLE_ALL_DATA = 'TOGGLE_ALL_DATA';
+export const ADD_USER = 'ADD_USER';

@@ -1,20 +1,153 @@
-/* eslint-disable max-len */
+/* eslint-disable */
 
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import '../styles/landing.scss';
 
-export default function Landing() {
-  return (
+export default class Landing extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.onAddNewUser = this.onAddNewUser.bind(this);
+    this.onCheckUser = this.onCheckUser.bind(this);
+    this.state={
+      showCreateAcc : false,
+      showSignIn : true
+    };
+    // this.showCreate = this.showCreate.bind(this);
+
+  }
+
+  onAddNewUser(newUser){
+    $.ajax({
+      url : "/addUser",
+      type : "post",
+      contentType : "application/json; charset=utf-8",
+      dataType : "json",
+      data : JSON.stringify(newUser),
+      cache : false,
+      success : function(userObj){
+          console.log("Success: user added");
+          if(userObj.length == 0){
+            alert("Error: The User Name Has Existed !");
+          }
+          else{
+            localStorage.setItem("userID",userObj['_id']);
+            localStorage.setItem("userName",userObj['userName']);
+            window.location.href = '/viz/';
+          }
+        
+      }.bind(this),
+      error : function(){
+          console.log("Error: user added failure!");
+      }
+    });
+  }
+
+  onCheckUser(existUser){
+
+    var curUserID;
+    $.ajax({
+      url : "/checkUser",
+      type : "get",
+      contentType : "application/json; charset=utf-8",
+      dataType : "json",
+      // data : JSON.stringify(existUser),
+      data: {user:existUser},
+      cache : false,
+      success : function(userObj){
+
+          
+
+          if(userObj){
+            localStorage.setItem("userID",userObj['id']);
+            localStorage.setItem("userName",userObj['userName']);
+            window.location.href = '/viz/';
+          }
+          else{
+            alert("Error: User Name or Password Incorrect!");
+          }
+
+
+      }.bind(this),
+      error : function(){
+          console.log("Error: user check failed!");
+      }
+    });
+ 
+  }
+
+
+  handleCreateAcc(event){
+		event.preventDefault();
+		if(this.refs.name.value == "" ||this.refs.password.value == "" ) {
+      alert("Error: Account and Password can't be empty!")
+      return;
+    }
+		var newUser={
+      userName : this.refs.name.value,
+      password : this.refs.password.value,
+      dataFiles: [],
+      sessionObjs: [],
+      curSessionObj: {
+        dataFileID:'',
+        features:[],
+        filters:[],
+        cluster:''
+      }
+    };
+		this.onAddNewUser(newUser);
+  }
+
+  handleSignIn(event){
+    event.preventDefault();
+    var existUser={
+      userName : this.refs.name.value,
+      password : this.refs.password.value
+    };
+		this.onCheckUser(existUser);
+  }
+
+  showCreate(){
+    this.setState({showCreateAcc:true,showSignIn:false});
+  }
+
+  showSignIn(){
+    this.setState({showCreateAcc:false,showSignIn:true});
+  }
+
+
+
+  render(){
+    let showCreateAcc = this.state.showCreateAcc;
+    let showSignIn = this.state.showSignIn;
+    return (
     <div className="wrapper">
-      <div className="jumbotron container ag-landing--hero">
+      <div style={{marginBottom:'0px',paddingBottom:'5px'}} className="jumbotron container ag-landing--hero">
         <h2 className="hero-text">Welcome to Avant-Garde!!</h2>
-        <LinkContainer to="dashboard">
-          <Button bsStyle="primary" bsSize="large">Go to Dashboard</Button>
-        </LinkContainer>
+        <br></br>
+            {showCreateAcc ? 
+            <form onSubmit={ this.handleCreateAcc.bind(this) }>
+              <h3>Create account</h3>
+              <input ref="name" type="text"  placeholder="name"/> <br></br>
+              <input ref="password" type="text"  placeholder="password"/> <br></br> <br></br>
+              <input type="button" value="Back" style={{marginRight:'25px'}} onClick={this.showSignIn.bind(this)} /> 
+              <input type="submit" value="Create" />
+            </form> : null
+            }
+            {showSignIn ? 
+            <form onSubmit={ this.handleSignIn.bind(this) }>
+              <h3>Sign in</h3>
+              <input ref="name" type="text"  placeholder="name"/> <br></br>
+              <input ref="password" type="text"  placeholder="password"/> <br></br> <br></br>
+              {/* <input type="button" value="Create Account" style={{marginRight:'15px'}} onClick={this.showCreate.bind(this)} />  */}
+              <input type="submit" value="Sign in" /> <br/>
+              <a href="#" onClick={this.showCreate.bind(this)}>Create Account </a> 
+				    </form> : null
+            }
       </div>
-      <div className="container">
+      <div style={{marginTop:'0px'}} className="container">
         <h3 className="">Avant-Garde Project</h3>
         <div>
           <p className="ag-landing--description">Avant-Garde is a multidisciplinary research project by Schools of Medicine and Computer Science and Engineering  at the UC San Diego. Led by Dr. Davey Smith, associate professor of medicine in the Division of Infectious Diseases, Avant-garde project aims to stimulate high-impact research that may lead to groundbreaking opportunities for the prevention and treatment of HIV/AIDS in drug abusers. </p>
@@ -29,12 +162,21 @@ export default function Landing() {
         <ul className="ag-landing--team">
           <li>Dr. Nadir Weibel (Supervision)</li>
           <li>Dr. Ali Sarvghad (Design, evaluation, supervision)</li>
-          <li>Vincent Liaw (Implementation, testing)</li>
-          <li>Joel Sequiera (Implementation, testing)</li>
+          <li>Vincent Liaw (Front-End Implementation)</li>
+          <li>Joel Sequiera (Front-End Implementation)</li>
+          <li>Xinghang Li (Back-End Implementation)</li>
           <li>Dr. Davey Smith</li>
           <li>Dr. Sanjay Mehta</li>
         </ul>
       </div>
     </div>
-  );
+    );
+  }
+
+
+
 }
+
+
+
+

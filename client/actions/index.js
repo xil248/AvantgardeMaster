@@ -1,8 +1,10 @@
+/* eslint-disable */
 import Filters from '../filtering';
 import DataUtils from '../utils/dataUtils';
 
 import {
   ADD_FEATURE,
+  LOAD_ALL_FEATURES,
   REMOVE_FEATURE,
   INIT_FILTERS,
   UPDATE_FILTERS,
@@ -24,8 +26,8 @@ import {
  * first action creator called
  */
 export function initializeFilters(datasetName) {
-  const data = DataUtils.chooseDataset(datasetName);
 
+  const data = DataUtils.chooseDataset(datasetName);
   return {
     type: INIT_FILTERS,
     payload: {
@@ -35,6 +37,19 @@ export function initializeFilters(datasetName) {
     },
   };
 }
+
+// export function initializeFilters(data) {
+//   console.log('!@!!!!!!!!!!!!');
+//   console.log(data);
+//   return {
+//     type: INIT_FILTERS,
+//     payload: {
+//       data,
+//       allData: data,
+//       filters: [],
+//     },
+//   };
+// }
 
 /**
  * Action creator to change filters of the data
@@ -60,6 +75,16 @@ export function addFeature(feature) {
   };
 }
 
+export function loadAllFeatures(features) {
+  // {featureName: featureData}
+  return {
+    type: LOAD_ALL_FEATURES,
+    payload: features,
+  };
+}
+
+
+
 /**
  * Action creator to remove a feature from displaying
  */
@@ -69,6 +94,12 @@ export function removeFeature(featureName) {
     payload: featureName,
   };
 }
+
+
+
+
+
+
 
 /**
  * Action creator to apply brushing
@@ -202,3 +233,35 @@ export function toggleAllData(show) {
     },
   };
 }
+
+
+export function addUser(newUser){
+  
+	return function(dispatch, getState){
+    console.log("AddUser !!!!!!!!!!!!!!!!!!");
+		$.ajax({
+			url : "/addUser",
+			type : "post",
+			contentType : "application/json; charset=utf-8",
+			dataType : "json",
+			//客户端与服务端通过json字符串进行通信
+			data : JSON.stringify(newUser),
+			cache : false,
+			success : function(users){
+				console.log("User Added");
+				// notes=notesSort(notes);
+				dispatch({ type : ADD_USER, users : users });
+			}.bind(this),
+			error : function(){
+				console.log("User Added Failed!");
+			}.bind(this)
+		});
+	}
+};
+
+
+
+
+
+
+

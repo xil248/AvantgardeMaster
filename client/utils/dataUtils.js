@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   defaultData,
   defaultMetaData,
@@ -11,6 +12,10 @@ import {
   FILTER_CONTINUOUS,
 } from '../filtering/filterTypes';
 
+import * as actions from '../actions/index';
+
+
+
 /**
  * Default Utility Class providing data reading accessibility functions
  */
@@ -20,8 +25,44 @@ class DataUtils {
     this.data = preprocessData(data, metaData);
     this.attributes = this.getAllAttributes();
     this.filterTypes = this.createFilterTypes();
+    // this.getRawData = this.getRawData.bind(this);    
+    this.setDataset = this.setDataset.bind(this);    
     this.metaData = metaData;
+
   }
+
+  /* Function to convert csv file to json file */
+  csvJSON(csv){
+    
+      var lines=csv.split("\n");
+    
+      var result = [];
+    
+      var headers=lines[0].split(",");
+    
+      for(var i=1;i<lines.length;i++){
+    
+        var obj = {};
+        var currentline=lines[i].split(",");
+    
+        for(var j=0;j<headers.length;j++){
+          obj[headers[j]] = currentline[j];
+        }
+    
+        result.push(obj);
+    
+      }
+      
+      // return result; //JavaScript object
+      return JSON.stringify(result); //JSON
+    }
+  
+
+
+
+
+  
+ 
 
   /**
    * Function that chooses a dataset. This will change the internal state
@@ -31,22 +72,74 @@ class DataUtils {
    * @return the processed dataset
    */
   chooseDataset(datasetName) {
-    let data = [];
-    let metaData = {};
+    
+    var validDataSet = true; 
+    var rawData; var metaData;
 
-    switch (datasetName) {
-      case 'artnet': {
-        data = artnetData;
-        metaData = artnetMetaData;
-        break;
+    // Get data and metadata from database
+    $.ajax({
+      url : "/getRawData",
+      type : "get",
+      async: false,
+      dataType : "json",
+      contentType : "application/json; charset=utf-8",
+      // data : JSON.stringify([userID]),
+      data : {Data_ID : datasetName},
+      cache : false,
+      success : function(dataFiles){
+        
+        if(dataFiles.length == 0){
+          // var data = this.setDataset(defaultData, defaultMetaData);
+          // // console.log(data)
+          // actions.initializeFilters(data);
+          validDataSet = false;
+        }
+        else{
+          
+          rawData = JSON.parse(dataFiles[0]['fileObj']);
+          var cluster = Object.keys(rawData[0])[0];
+          // console.log(cluster);
+          var dateVal = null;
+          var zipVal = null;
+          var types = JSON.parse(dataFiles[0]['dataType']);
+          for(var prop in types){
+            if(types[prop] == 'Enrollment Date'){
+              dateVal = prop;
+            }
+            if(types[prop] == 'Zipcode'){
+              zipVal = prop;
+            }
+          }
+      
+          metaData =  {
+            name: dataFiles[0]['fileName'],
+            key: dataFiles[0]['_id'],
+            dateKey: dateVal,
+            getDateFunction(val) {
+              return new Date(val);
+            },
+            defaultClusterFeature: cluster,
+            zipKey: zipVal,
+          };
+
+        }
+
+      
+      }.bind(this),
+      error : function(err){
+          console.log("getRawData failed !");
+          console.log(err);
       }
-      default: {
-        data = defaultData;
-        metaData = defaultMetaData;
-      }
+    });
+
+    if(validDataSet){
+      return this.setDataset(rawData, metaData);
+    }
+    else{
+      return this.setDataset(defaultData, defaultMetaData);
     }
 
-    return this.setDataset(data, metaData);
+    // return this.setDataset(data, metaData);
   }
 
   /**
