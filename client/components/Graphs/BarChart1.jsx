@@ -12,7 +12,11 @@ import {
 import {
   gradBins as GradBins,
 } from './BarChart/model/gradBins';
-import DataUtils from '../../utils/dataUtils';
+// import DataUtils from '../../utils/dataUtils';
+import { connect } from 'react-redux';
+
+import * as actions from '../../actions';
+
 
 
 // const DragSelect = require('dragselect');
@@ -25,12 +29,16 @@ class BarChart1 extends React.Component {
 
   static get propTypes() {
     return {
-      // data: PropTypes.array.isRequired,
+      data: PropTypes.array.isRequired,
       label: PropTypes.string.isRequired,
       // rectWidth: PropTypes.number,
       // change: PropTypes.bool,
       // chart: PropTypes.node,
       // connectFauxDOM: PropTypes.func.isRequired,
+      brushedData: PropTypes.array,
+      brush: PropTypes.bool,
+      applyBrush: PropTypes.func,
+      removeBrush: PropTypes.func,
 
     };
   }
@@ -39,6 +47,10 @@ class BarChart1 extends React.Component {
     return {
       width: 400,
       height: 200,
+      brushedData: [],
+      brush: false,
+      applyBrush() {},
+      removeBrush() {},
       // rectWidth: null,
       // chart: 'loading',
       // change: false,
@@ -54,8 +66,8 @@ class BarChart1 extends React.Component {
     const {
       label,
     } = this.props;
-    console.log(DataUtils.data);
-    const bins = new GradBins(DataUtils.data, label);
+    console.log('data', this.props.data);
+    const bins = new GradBins(this.props.data, label);
     this.createChart(bins);
   }
 
@@ -222,6 +234,7 @@ class BarChart1 extends React.Component {
         .attr('transform', this.getBarTransform.bind(this))
         .style('cursor', 'pointer');
 
+
     // rects
     this.rect = this.bar.append('rect')
       .attr('class', 'rect')
@@ -234,6 +247,22 @@ class BarChart1 extends React.Component {
       .on('mouseover', this.RectMouseOver)
       .on('mouseout', this.RectMouseOut);
 
+    // this.brushRect = this.bar.append('rect')
+    // .on('click', this.RectClick.bind(this))
+    // .on('mouseover', this.RectMouseOver.bind(this))
+    // .on('mouseout', this.RectMouseOut.bind(this));
+    // ;
+
+    // this.rect = this.bar.append('rect')
+    //   .attr('class', 'brush')
+    //   .attr('x', this.getX.bind(this))
+    //   .attr('width', this.getWidth.bind(this))
+    //   .attr('height', this.getHeight.bind(this))
+    //   .style('fill', '#3690c0')
+    //   .style('stroke', 'black')
+    //   .on('click', this.RectClick.bind(this))
+    //   .on('mouseover', this.RectMouseOver)
+    //   .on('mouseout', this.RectMouseOut);
     // x Axis
     this.xAxis = this.chart.append('g')
       .attr('transform', `translate(0,${this.height})`)
@@ -1068,6 +1097,37 @@ class BarChart1 extends React.Component {
 
   render() {
     // console.log(ReactFauxDOM.mixins.core.connectFauxDOM);
+    // const { brush, brushedData, label } = this.props;
+
+
+    // if (brush) {
+    //   brushedData.forEach((element) => {
+    //     for (let i = 0; i < this.bins.container.length; i += 1) {
+    //       // console.log(this.bins.container[this.bins.container.length].rangeMin());
+    //       if (element[label] >= this.bins.container[i].rangeMin() && element[label] < this.bins.container[i].rangeMax()) {
+    //         this.brushValues[i] += 1;
+    //       }
+    //     }
+    //   });
+    // } else {
+    //   this.brushValues = [];
+    //   for (let i = 0; i < this.bins.container.length; i += 1) {
+    //     this.brushValues.push(0);
+    //   }
+    // }
+
+    // console.log(this.brushValues);
+    // this.brushRect
+    // .attr('x', d => (this.getX(d)))
+    // .attr('width', d => (this.getWidth(d)))
+    // // .attr('height', (d, i) => (this.state.height - this.state.y(brushValues[i]) - this.state.y(d.value())))
+    // .attr('height', (d, i) => (this.height - this.y(this.brushValues[i])))
+    // .attr('y', (d, i) => (-this.y(d.value()) + this.y(this.brushValues[i])))
+    // .style('fill', '#ff7f00')
+    // .attr('stroke', 'black')
+    // .style('opacity', 0.5);
+
+
     const uid = this.uid;
     const className = `bar-chart-${uid}`;
 
@@ -1091,4 +1151,10 @@ class BarChart1 extends React.Component {
   }
 }
 
-export default BarChart1;
+function mapStateToProps(state) {
+  return {
+    data: state.filters.data,
+  };
+}
+export default connect(mapStateToProps, actions)(BarChart1);
+
