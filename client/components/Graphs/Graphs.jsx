@@ -37,23 +37,23 @@ const propTypes = {
   /**
    * Action creator to apply brushing
    */
-  // applyBrush: PropTypes.func,
+  applyBrush: PropTypes.func,
 
   /**
    * Action creator to remove brushing
    */
-  // removeBrush: PropTypes.func,
+  removeBrush: PropTypes.func,
 
   /**
    * The brushed data from GraphContainer
    */
-  // brushedData: PropTypes.array,
+  brushedData: PropTypes.array,
 
   /**
    * Whether brushing is on. From Redux state but
    * passed in from GraphContainer.
    */
-  // brush: PropTypes.bool,
+  brush: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -244,8 +244,13 @@ class Graphs extends React.Component {
               <div key={feature} className="ag-chart--barchart">
                 <BarChart1
                   // bins={bins}
+                  // data={this.props.data}
                   label={feature}
                   width={200}
+                  brush={this.props.brush}
+                  brushedData={this.props.brushedData}
+                  applyBrush={this.props.applyBrush}
+                  removeBrush={this.props.removeBrush}
                 />
                 <div className="ag-chart--barchart-title text-center">
                   <Confidence feature={feature} />
