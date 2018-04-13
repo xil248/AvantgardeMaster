@@ -11,6 +11,12 @@ Medical AIDS/HIV data visualization process for Dr. Ali Sarvghad and Prof. Nadir
 
 ## Setup
 
+* Install [mongoDB] (https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
+* After the installation, run mongoDB on backend.
+```bash
+$ mongod
+```
+
 * Install [yarn](https://yarnpkg.com/en/docs/install)
 * Inside the main directory of the project, run `yarn`
 
