@@ -14,7 +14,9 @@ import {
 } from './BarChart/model/gradBins';
 // import DataUtils from '../../utils/dataUtils';
 import { connect } from 'react-redux';
-
+import {
+  FILTER_CONTINUOUS,
+} from '../../filtering/filterTypes';
 import * as actions from '../../actions';
 
 
@@ -62,17 +64,17 @@ class BarChart1 extends React.Component {
   }
 
   componentWillMount() {
-    console.log(`start render ${performance.now()}`);
+    // console.log(`start render ${performance.now()}`);
     const {
       label,
     } = this.props;
-    console.log('data', this.props.data);
+    // console.log('data', this.props.data);
     const bins = new GradBins(this.props.data, label);
     this.createChart(bins);
   }
 
   componentDidMount() {
-    console.log(`end render ${performance.now()}`);
+    // console.log(`end render ${performance.now()}`);
     this.forceUpdate();
   }
 
@@ -85,12 +87,12 @@ class BarChart1 extends React.Component {
   }
 
   onDragHandler(e) {
-    console.log(e);
+    // console.log(e);
     this.forceUpdate();
   }
 
   onDragStartHandler(e) {
-    console.log(e);
+    // console.log(e);
     this.forceUpdate();
   }
 
@@ -101,7 +103,7 @@ class BarChart1 extends React.Component {
     const bins = this.bins;
     let start = this.rectInterval;
     let length = 0;
-    // console.log(this.bins);
+    // // console.log(this.bins);
 
     for (let i = 0; i < bins.container.length; i += 1) {
       length = bins.container[i].size() / bins.interval;
@@ -109,7 +111,7 @@ class BarChart1 extends React.Component {
       arr.push(start - ((this.rectWidth * length) / 2));
     }
 
-    // console.log(arr);
+    // // console.log(arr);
     return arr;
   }
 
@@ -234,7 +236,11 @@ class BarChart1 extends React.Component {
         .attr('transform', this.getBarTransform.bind(this))
         .style('cursor', 'pointer');
 
-
+    this.brushRect = this.bar.append('rect')
+      // .on('click', this.RectClick.bind(this))
+      // .on('mouseover', this.RectMouseOver.bind(this))
+      // .on('mouseout', this.RectMouseOut.bind(this));
+    ;
     // rects
     this.rect = this.bar.append('rect')
       .attr('class', 'rect')
@@ -243,15 +249,10 @@ class BarChart1 extends React.Component {
       .attr('height', this.getHeight.bind(this))
       .style('fill', '#3690c0')
       .style('stroke', 'black')
+      .style('opacity', '0.8')
       .on('click', this.RectClick.bind(this))
-      .on('mouseover', this.RectMouseOver)
-      .on('mouseout', this.RectMouseOut);
-
-    // this.brushRect = this.bar.append('rect')
-    // .on('click', this.RectClick.bind(this))
-    // .on('mouseover', this.RectMouseOver.bind(this))
-    // .on('mouseout', this.RectMouseOut.bind(this));
-    // ;
+      .on('mouseover', this.RectMouseOver.bind(this))
+      .on('mouseout', this.RectMouseOut.bind(this));
 
     // this.rect = this.bar.append('rect')
     //   .attr('class', 'brush')
@@ -292,61 +293,61 @@ class BarChart1 extends React.Component {
     this.svgOn();
   }
 
-  update(bins) {
-    this.bar.remove();
-    this.yAxis.remove();
-    this.bins = bins;
-    if (this.rectWidth == null) {
-      this.rectWidth = (this.width - (2 * this.rectInterval)) / this.bins.container.length;
-    }
+  // update(bins) {
+  //   this.bar.remove();
+  //   this.yAxis.remove();
+  //   this.bins = bins;
+  //   if (this.rectWidth == null) {
+  //     this.rectWidth = (this.width - (2 * this.rectInterval)) / this.bins.container.length;
+  //   }
 
-    // bar config
-    this.rectX = this.getRectX();
+  //   // bar config
+  //   this.rectX = this.getRectX();
 
-    // y axis config
-    this.y = d3.scaleLinear()
-              .range([this.height, 0])
-              .domain([0, this.bins.maxY]);
+  //   // y axis config
+  //   this.y = d3.scaleLinear()
+  //             .range([this.height, 0])
+  //             .domain([0, this.bins.maxY]);
 
-    this.bar = this.chart.selectAll('g')
-    .data(this.bins.container)
-      .enter().append('g')
-        .attr('class', 'bar')
-        .attr('transform', this.getBarTransform.bind(this))
-        .style('cursor', 'pointer');
+  //   this.bar = this.chart.selectAll('g')
+  //   .data(this.bins.container)
+  //     .enter().append('g')
+  //       .attr('class', 'bar')
+  //       .attr('transform', this.getBarTransform.bind(this))
+  //       .style('cursor', 'pointer');
 
-    // rects
-    this.rect = this.bar.append('rect')
-      .attr('class', 'rect')
-      .attr('x', this.getX.bind(this))
-      .attr('width', this.getWidth.bind(this))
-      .attr('height', this.getHeight.bind(this))
-      .style('fill', '#3690c0')
-      .style('stroke', 'black')
-      .on('click', this.RectClick.bind(this))
-      .on('mouseover', this.RectMouseOver)
-      .on('mouseout', this.RectMouseOut);
+  //   // rects
+  //   this.rect = this.bar.append('rect')
+  //     .attr('class', 'rect')
+  //     .attr('x', this.getX.bind(this))
+  //     .attr('width', this.getWidth.bind(this))
+  //     .attr('height', this.getHeight.bind(this))
+  //     .style('fill', '#3690c0')
+  //     .style('stroke', 'black')
+  //     .on('click', this.RectClick.bind(this))
+  //     .on('mouseover', this.RectMouseOver.bind(this))
+  //     .on('mouseout', this.RectMouseOut);
 
-    // y Axis
-    this.yAxis = this.chart.append('g')
-    .call(d3.axisLeft(this.y))
-    .append('text')
-      .attr('transform', 'rotate(-90) translate(-30,0)')
-      .attr('y', 6)
-      .attr('dy', '.71em')
-      .style('text-anchor', 'end')
-      .style('fill', 'black')
-      .text('# of people');
+  //   // y Axis
+  //   this.yAxis = this.chart.append('g')
+  //   .call(d3.axisLeft(this.y))
+  //   .append('text')
+  //     .attr('transform', 'rotate(-90) translate(-30,0)')
+  //     .attr('y', 6)
+  //     .attr('dy', '.71em')
+  //     .style('text-anchor', 'end')
+  //     .style('fill', 'black')
+  //     .text('# of people');
 
-    // tag
-    this.tag = this.bar.append('text')
-      .text(d => `${d.rangeMin()}  - ${d.rangeMax()}`)
-      .attr('transform', this.getTagTransform.bind(this))
-      .style('text-anchor', 'middle')
-      .style('fill', 'black')
-      .style('font', '9px sans-serif')
-      .on('click', this.RectClick.bind(this));
-  }
+  //   // tag
+  //   this.tag = this.bar.append('text')
+  //     .text(d => `${d.rangeMin()}  - ${d.rangeMax()}`)
+  //     .attr('transform', this.getTagTransform.bind(this))
+  //     .style('text-anchor', 'middle')
+  //     .style('fill', 'black')
+  //     .style('font', '9px sans-serif')
+  //     .on('click', this.RectClick.bind(this));
+  // }
   svgOn() {
     this.svg.call(d3.drag()
       .on('start', this.ChartClick.bind(this))
@@ -385,7 +386,7 @@ class BarChart1 extends React.Component {
   }
 
   moveTip(dx) {
-    // console.log(dx);
+    // // console.log(dx);
     this.rangeTip.attr('dx', `${(dx / 2)}px`);
     this.valueTip.attr('dx', `${(dx / 2)}px`);
   }
@@ -480,7 +481,7 @@ class BarChart1 extends React.Component {
     this.triangles = triangles;
 
     if (this.i !== 0) {
-      // console.log(tri0);
+      // // console.log(tri0);
       tri0.call(d3.drag()
         .on('start', this.TriangleLLClick.bind(this))
         .on('drag', this.TriangleLLDrag.bind(this))
@@ -547,18 +548,31 @@ class BarChart1 extends React.Component {
   }
 
 
-  RectMouseOver() {
-    d3.select(this).style('opacity', '0.8');
+  RectMouseOver(d, i, e) {
+    // console.log(e);
+    const { label } = this.props;
+    d3.select(e[i]).style('opacity', '0.5');
+    if (!this.props.brush){
+      this.props.applyBrush(this.props.data, [{
+        name: label,
+        type: FILTER_CONTINUOUS,
+        minVal: this.bins.container[i].rangeMin(),
+        maxVal: this.bins.container[i].rangeMax(),
+      }]);
+    }
   }
 
-  RectMouseOut() {
-    d3.select(this).style('opacity', '1');
+  RectMouseOut(d, i, e) {
+    d3.select(e[i]).style('opacity', '0.8');
+    if (this.props.brush) {
+      this.props.removeBrush();
+    }
     // pointer.forceUpdate();
-    // console.log(pointer);
+    // // console.log(pointer);
   }
 
   ChartClick() {
-    // console.log(this.chart.node());
+    // // console.log(this.chart.node());
     // if (!d3.event.sourceEvent.defaultPrevented) {
     this.chart.select('#selection').remove();
     this.chart.selectAll('.tip').remove();
@@ -577,7 +591,7 @@ class BarChart1 extends React.Component {
 
   ChartDrag() {
     // if (!d3.event.sourceEvent.defaultPrevented) {
-    console.log(d3.event.sourceEvent.x, d3.event.sourceEvent.y);
+    // console.log(d3.event.sourceEvent.x, d3.event.sourceEvent.y);
     if (d3.event.sourceEvent.x - this.posX > 0) {
       this.dragselect.attr('width', d3.event.sourceEvent.x - this.posX);
     } else {
@@ -607,9 +621,9 @@ class BarChart1 extends React.Component {
     const y2 = y1 + parseFloat(this.dragselect.attr('height'));
     const maxY = this.height;
 
-    console.log(x1, x2, minX, maxX);
+    // console.log(x1, x2, minX, maxX);
     if (x1 < minX && x2 > maxX && y1 < maxY && y2 > maxY) {
-      console.log('hey');
+      // console.log('hey');
 
       this.chart.select('#selection').remove();
       this.chart.selectAll('.tip').remove();
@@ -682,7 +696,7 @@ class BarChart1 extends React.Component {
 
   // LL
   TriangleLLClick() {
-    console.log(d3.event);
+    // console.log(d3.event);
     // d3.event.sourceEvent.preventDefault();
     const d = this.bins.container[this.i];
     this.currentX = d3.event.sourceEvent.x;
@@ -737,7 +751,7 @@ class BarChart1 extends React.Component {
   // LL
   TriangleLLDrag() {
     // d3.event.sourceEvent.preventDefault();
-    console.log('a');
+    // console.log('a');
     // set up
     const rect = this.chart.select('#selection rect');
     const leftTri = this.chart.select('#selection .ll');
@@ -904,7 +918,7 @@ class BarChart1 extends React.Component {
       dx = 0;
     }
     const newWidth = this.oldWidth + dx;
-    console.log(this.rectx);
+    // console.log(this.rectx);
     // change selection
 
     rect.attr('x', this.rectx)
@@ -993,7 +1007,7 @@ class BarChart1 extends React.Component {
     let d = this.bins.container[this.i];
     let dx = parseFloat(rect.attr('width')) - this.oldWidth;
 
-    // console.log(dx)
+    // // console.log(dx)
     // calculate number
     let x = d.rangeMax();
     while (d.next != null) {
@@ -1001,7 +1015,7 @@ class BarChart1 extends React.Component {
 
       // in rectangle
       const width = (d.size() / this.bins.interval) * this.rectWidth;
-      // console.log(width)
+      // // console.log(width)
       const ratio = dx / width;
       dx -= width;
       if (ratio < 1) {
@@ -1035,7 +1049,7 @@ class BarChart1 extends React.Component {
 
     const dx = (this.oldWidth - parseFloat(rect.attr('width'))) + 1;
     const pos = d.rangeMax() - parseInt((dx / this.oldWidth) * this.bins.container[this.i].size(), 10);
-    // console.log(pos)
+    // // console.log(pos)
 
     this.bins.splitRight(this.sub, pos);
     return pos;
@@ -1096,36 +1110,35 @@ class BarChart1 extends React.Component {
   }
 
   render() {
-    // console.log(ReactFauxDOM.mixins.core.connectFauxDOM);
-    // const { brush, brushedData, label } = this.props;
+    // // console.log(ReactFauxDOM.mixins.core.connectFauxDOM);
+    const { brush, brushedData, label } = this.props;
+    this.brushValues = [];
+    for (let i = 0; i < this.bins.container.length; i += 1) {
+      this.brushValues.push(0);
+    }
 
+    if (brush) {
+      console.log('brush', brushedData);
+      brushedData.forEach((element) => {
+        for (let i = 0; i < this.bins.container.length; i += 1) {
+          // // console.log(this.bins.container[this.bins.container.length].rangeMin());
+          if (element[label] >= this.bins.container[i].rangeMin() && element[label] < this.bins.container[i].rangeMax()) {
+            this.brushValues[i] += 1;
+          }
+        }
+      });
+    }
 
-    // if (brush) {
-    //   brushedData.forEach((element) => {
-    //     for (let i = 0; i < this.bins.container.length; i += 1) {
-    //       // console.log(this.bins.container[this.bins.container.length].rangeMin());
-    //       if (element[label] >= this.bins.container[i].rangeMin() && element[label] < this.bins.container[i].rangeMax()) {
-    //         this.brushValues[i] += 1;
-    //       }
-    //     }
-    //   });
-    // } else {
-    //   this.brushValues = [];
-    //   for (let i = 0; i < this.bins.container.length; i += 1) {
-    //     this.brushValues.push(0);
-    //   }
-    // }
-
-    // console.log(this.brushValues);
-    // this.brushRect
-    // .attr('x', d => (this.getX(d)))
-    // .attr('width', d => (this.getWidth(d)))
-    // // .attr('height', (d, i) => (this.state.height - this.state.y(brushValues[i]) - this.state.y(d.value())))
-    // .attr('height', (d, i) => (this.height - this.y(this.brushValues[i])))
-    // .attr('y', (d, i) => (-this.y(d.value()) + this.y(this.brushValues[i])))
-    // .style('fill', '#ff7f00')
-    // .attr('stroke', 'black')
-    // .style('opacity', 0.5);
+    console.log(this.brushValues);
+    this.brushRect
+      .attr('x', d => (this.getX(d)))
+      .attr('width', d => (this.getWidth(d)))
+      // .attr('height', (d, i) => (this.state.height - this.state.y(brushValues[i]) - this.state.y(d.value())))
+      .attr('height', (d, i) => (this.height - this.y(this.brushValues[i])))
+      .attr('y', (d, i) => (-this.y(d.value()) + this.y(this.brushValues[i])))
+      .style('fill', '#3690c0')
+      .attr('stroke', 'black');
+      // .style('opacity', 0.5);
 
 
     const uid = this.uid;

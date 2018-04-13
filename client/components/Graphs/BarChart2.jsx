@@ -7,18 +7,28 @@ import * as d3 from 'd3';
 // import { ReactDOM } from 'react-dom';
 import { createElement } from 'react-faux-dom';
 import {
+  FILTER_CATEGORICAL,
+} from '../../filtering/filterTypes';
+import { connect } from 'react-redux';
+import * as actions from '../../actions';
+import {
   createUniqueID,
 } from '../../utils/graphUtils';
 
 class BarChart2 extends React.Component {
   static get propTypes() {
     return {
+      metadata: PropTypes.array.isRequired,
       data: PropTypes.array.isRequired,
-      // label: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
       // rectWidth: PropTypes.number,
       // change: PropTypes.bool,
       // chart: PropTypes.node,
       // connectFauxDOM: PropTypes.func.isRequired,
+      brushedData: PropTypes.array,
+      brush: PropTypes.bool,
+      applyBrush: PropTypes.func,
+      removeBrush: PropTypes.func,
 
     };
   }
@@ -27,6 +37,10 @@ class BarChart2 extends React.Component {
     return {
       width: 400,
       height: 200,
+      brushedData: [],
+      brush: false,
+      applyBrush() {},
+      removeBrush() {},
       // rectWidth: null,
       // chart: 'loading',
       // change: false,
@@ -40,9 +54,7 @@ class BarChart2 extends React.Component {
 
   componentWillMount() {
     // const faux = this.props.connectFauxDOM('div', 'chart');
-    const {
-      data,
-    } = this.props;
+    const { data } = this.props;
     this.createChart(data);
   }
 
@@ -61,7 +73,7 @@ class BarChart2 extends React.Component {
       arr.push(start);
     }
 
-    console.log(arr);
+    // console.log(arr);
     return arr;
   }
 
@@ -123,7 +135,7 @@ class BarChart2 extends React.Component {
     }
 
     y = y < 0 ? y : 0;
-    console.log(`y: ${y}`);
+    // console.log(`y: ${y}`);
     this.valueTip
       .attr('x', x)
       .attr('y', y)
@@ -172,6 +184,7 @@ class BarChart2 extends React.Component {
   createChart(data) {
     // this.root = this.props.connectFauxDOM('div', 'chart');
     this.root = createElement('div');
+    this.canbrush = true;
     // bins config
     if (this.bins == null) {
       this.bins = [];
@@ -260,6 +273,13 @@ class BarChart2 extends React.Component {
 
     // rects
     let id = -1;
+    this.brushRect = this.bar
+      .append('rect')
+      .attr('class', () => { id += 1; return `brushRect${id}`; })
+      .style('fill', '#3690c0');
+      // .style('stroke', 'black');
+
+    id = -1;
     this.rect = this.bar.selectAll('g')
       .data((d) => { return d; })
       .enter()
@@ -270,6 +290,7 @@ class BarChart2 extends React.Component {
       .attr('width', this.length)
       .attr('height', this.getHeight.bind(this))
       .style('fill', '#3690c0')
+      .style('opacity', 0.8)
       .style('stroke', 'black')
       // .on('click', this.RectClick.bind(this))
       .on('mouseover', this.RectMouseOver.bind(this))
@@ -395,7 +416,7 @@ class BarChart2 extends React.Component {
   }
 
   AdaptRectClick(d, i, e) {
-    console.log(e[i].props.className);
+    // console.log(e[i].props.className);
     this.className = `rect${parseInt(e[i].props.className, 10)}`;
     const dragRect = this.chart.select(this.className);
     // mouse x, y position
@@ -424,7 +445,7 @@ class BarChart2 extends React.Component {
   RectSolidClick(d, i, e) {
     this.forbidV = e.length === 1 && this.forbidV;
 
-    console.log(e);
+    // console.log(e);
     const dragRect = d3.select(e[i]);
     this.className = dragRect.attr('class');
     // if click last time not clean dragrects
@@ -478,10 +499,24 @@ class BarChart2 extends React.Component {
   }
   RectMouseOver(d, i, e) {
     const j = parseInt(d3.select(e[i]).node().parentNode.props.className, 10);
-    console.log(j);
+    // console.log(j);
     this.createTip(d, j, i);
-    d3.select(e[i])
-      .style('opacity', '0.8');
+    let attrib = [];
+    for( let j = 0; j < e.length; j += 1) {
+      attrib.push(e[j].__data__.x);
+    }
+    const filteredData = this.props.metadata.filter(e => {
+      for (let j = 0; j < attrib.length; j += 1) {
+        if (e[this.props.label] === attrib[j]) {
+          return true;
+        }
+      }
+      return false;
+    })
+    console.log(attrib, this.props.label, filteredData);
+    if (!this.props.brush) {
+      this.props.applyBrush(filteredData, null, true);
+    }
     this.forceUpdate();
   }
 
@@ -491,9 +526,12 @@ class BarChart2 extends React.Component {
     // this.rangeTip.style('display', 'none');
     // this.valueTip = null;
     // this.rangeTip = null;
-    console.log(this.valueTip);
+    // console.log(this.valueTip);
+    if (this.props.brush) {
+      this.props.removeBrush();
+    }
     d3.select(e[i])
-      .style('opacity', '1');
+      .style('opacity', '0.8');
     this.forceUpdate();
   }
 
@@ -515,6 +553,7 @@ class BarChart2 extends React.Component {
   }
   // RL
   RectClick(d, i, e) {
+    this.canbrush = false;
     const dragRect = d3.select(e[i]);
     this.className = dragRect.attr('class');
     // mouse x, y position
@@ -571,6 +610,7 @@ class BarChart2 extends React.Component {
       if (this.adaptRect !== undefined && this.adaptRect !== null) {
         this.adaptRect.attr('transform', `translate( 0, ${dy} )`);
       }
+      // console.log(this.chart.select(`.${a}`));
     } else if (this.mode === 'h') {
       this.dragRects.forEach((a) => {
         this.chart.select(`.${a}`).attr('x', this.dragRectsValue[a].x + dx);
@@ -599,7 +639,7 @@ class BarChart2 extends React.Component {
     if (this.adaptRect !== undefined && this.adaptRect !== null) {
       this.adaptRect.attr('transform', 'translate( 0 , 0 )');
     }
-    console.log(this.chart.select(`.${this.className}`));
+    // console.log(this.chart.select(`.${this.className}`));
     // // let update = false;
 
     // this.dragRect.attr('x', this.rectx);
@@ -628,7 +668,7 @@ class BarChart2 extends React.Component {
             });
           }
 
-          console.log(j);
+          // console.log(j);
           // add d
           this.dragRectsD.forEach((e) => {
             this.bins[j].push(e);
@@ -644,7 +684,7 @@ class BarChart2 extends React.Component {
           const newBin = this.bins;
           this.bins = [];
           newBin.forEach((e) => {
-            console.log(this.bins, e);
+            // console.log(this.bins, e);
             this.insertPriority(e);
           });
 
@@ -666,7 +706,7 @@ class BarChart2 extends React.Component {
 
       // add d
       this.dragRectsD.forEach((e) => {
-        console.log(e, this.bins);
+        // console.log(e, this.bins);
         this.bins.push([e]);
       });
 
@@ -679,7 +719,7 @@ class BarChart2 extends React.Component {
       const newBin = this.bins;
       this.bins = [];
       newBin.forEach((e) => {
-        console.log(this.bins, e);
+        // console.log(this.bins, e);
         this.insertPriority(e);
       });
 
@@ -696,12 +736,69 @@ class BarChart2 extends React.Component {
       this.chart.select(`.rect${e[j]}`)
         .attr('y', height)
         .attr('height', curHeight);
-      console.log(curHeight);
+      // console.log(curHeight);
       height -= curHeight;
     }
   }
 
   render() {
+    const { brush, brushedData, label } = this.props;
+    // console.log('brush', brushedData, this.bins, label);
+
+
+    for (let i = 0; i < this.bins.length; i += 1) {
+      for (let j = 0; j < this.bins[i].length; j += 1) {
+        this.bins[i][j].y2 = 0;
+      }
+    }
+
+
+    if (brush) {
+      brushedData.forEach((element) => {
+        for (let i = 0; i < this.bins.length; i += 1) {
+          for (let j = 0; j < this.bins[i].length; j += 1) {
+            if (element[label] === this.bins[i][j].x) {
+              this.bins[i][j].y2 += 1;
+            }
+          }
+        }
+      });
+    }
+
+    if (this.canbrush) {
+      this.brushRect
+        .attr('class', (d, i) => `brushrect${i}`)
+        .attr('x', -this.length / 2)
+        .attr('y', (d, i) => {
+          let sum = 0;
+          for (let j = 0; j < this.bins[i].length; j += 1) {
+            // console.log(this.bins[i][j]);
+            if (this.bins[i][j].y2 !== undefined) {
+              sum += this.bins[i][j].y2;
+            }
+          }
+          console.log(this.y(sum));
+          return this.y(sum) - 120;
+        })
+        .attr('width', this.length)
+        .attr('height', (d, i) => {
+          let sum = 0;
+          for (let j = 0; j < this.bins[i].length; j += 1) {
+            // console.log(this.bins[i][j]);
+            if (this.bins[i][j].y2 !== undefined) {
+              sum += this.bins[i][j].y2;
+            }
+          }
+          console.log(this.y(sum));
+          return 120 - this.y(sum);
+        }
+          // d => this.height - this.y(d.y2)
+        );
+    } else {
+      this.brushRect.attr('width', 0);
+    }
+
+    // console.log('brush', this.bins);
     const uid = this.uid;
     const className = `bar-chart-${uid}`;
 
@@ -714,5 +811,9 @@ class BarChart2 extends React.Component {
   }
 
 }
-
-export default BarChart2;
+function mapStateToProps(state) {
+  return {
+    metadata: state.filters.data,
+  };
+}
+export default connect(mapStateToProps, actions)(BarChart2);

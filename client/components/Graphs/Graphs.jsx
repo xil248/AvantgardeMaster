@@ -226,8 +226,13 @@ class Graphs extends React.Component {
             return (
               <div key={feature} className="ag-chart--barchart">
                 <BarChart2
+                  label={feature}
                   data={data}
                   width={200}
+                  brush={this.props.brush}
+                  brushedData={this.props.brushedData}
+                  applyBrush={this.props.applyBrush}
+                  removeBrush={this.props.removeBrush}
                   // mouseOutHandler={this.mouseOutHandler}
                   // mouseOverHandler={(d, e) => this.mouseOverHandler(d, e, feature, type)}
                 />

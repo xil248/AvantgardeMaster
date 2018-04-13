@@ -9,20 +9,25 @@ export class gradBins {
 		this.label = label;
 
 
+		data.filter(function(a){
+			return a[label] != null;
+		})
 		// Sort
 		data.sort(function(a,b){
-			return a[label] - b[label]
+			return a[label] - b[label];
 		})
 
+		this.data = data;
+		console.log(this.data);
 		// Find valid points and add to data
-		var index = 0;
-		for(var i=0;i<data.length;i++){
-			if(data[i][label] != null && data[i][label] >= 0){
-				index = i;
-				break;
-			}
-		}
-		this.data = data.slice(index)
+		// var index = 0;
+		// for(var i=0;i<data.length;i++){
+		// 	if(data[i][label] != null && data[i][label] >= 0){
+		// 		index = i;
+		// 		break;
+		// 	}
+		// }
+		// this.data = data.slice(index)
 
 		// console.log(this.data);
 		// arrange into parts
