@@ -277,6 +277,26 @@ class Filters {
       return show;
     });
   }
+
+  /**
+   * Function that create arrange for data
+   *
+   * @param   data: all the data to be arranged
+   * @param   arrange: the arrange returned
+   */
+
+   /*
+    arrange: [
+      {min: 20, max: 30}
+      {min: 30, max: 40}
+      {min: 50, max: 70}
+    ]
+   */
+  // arrange(data, arrange, num) {
+
+  // }
+
+
 }
 
 export default new Filters();

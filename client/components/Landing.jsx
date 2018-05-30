@@ -37,7 +37,7 @@ export default class Landing extends React.Component {
             localStorage.setItem("userName",userObj['userName']);
             window.location.href = '/viz/';
           }
-        
+
       }.bind(this),
       error : function(){
           console.log("Error: user added failure!");
@@ -58,7 +58,7 @@ export default class Landing extends React.Component {
       cache : false,
       success : function(userObj){
 
-          
+
 
           if(userObj){
             localStorage.setItem("userID",userObj['id']);
@@ -75,7 +75,7 @@ export default class Landing extends React.Component {
           console.log("Error: user check failed!");
       }
     });
- 
+
   }
 
 
@@ -127,23 +127,23 @@ export default class Landing extends React.Component {
       <div style={{marginBottom:'0px',paddingBottom:'5px'}} className="jumbotron container ag-landing--hero">
         <h2 className="hero-text">Welcome to Avant-Garde!!</h2>
         <br></br>
-            {showCreateAcc ? 
+            {showCreateAcc ?
             <form onSubmit={ this.handleCreateAcc.bind(this) }>
               <h3>Create account</h3>
               <input ref="name" type="text"  placeholder="name"/> <br></br>
               <input ref="password" type="text"  placeholder="password"/> <br></br> <br></br>
-              <input type="button" value="Back" style={{marginRight:'25px'}} onClick={this.showSignIn.bind(this)} /> 
+              <input type="button" value="Back" style={{marginRight:'25px'}} onClick={this.showSignIn.bind(this)} />
               <input type="submit" value="Create" />
             </form> : null
             }
-            {showSignIn ? 
+            {showSignIn ?
             <form onSubmit={ this.handleSignIn.bind(this) }>
               <h3>Sign in</h3>
               <input ref="name" type="text"  placeholder="name"/> <br></br>
               <input ref="password" type="text"  placeholder="password"/> <br></br> <br></br>
               {/* <input type="button" value="Create Account" style={{marginRight:'15px'}} onClick={this.showCreate.bind(this)} />  */}
               <input type="submit" value="Sign in" /> <br/>
-              <a href="#" onClick={this.showCreate.bind(this)}>Create Account </a> 
+              <a href="#" onClick={this.showCreate.bind(this)}>Create Account </a>
 				    </form> : null
             }
       </div>
@@ -162,6 +162,7 @@ export default class Landing extends React.Component {
         <ul className="ag-landing--team">
           <li>Dr. Nadir Weibel (Supervision)</li>
           <li>Dr. Ali Sarvghad (Design, evaluation, supervision)</li>
+          <li>Zifeng Chris Xie (Front-End Implementation)</li>
           <li>Vincent Liaw (Front-End Implementation)</li>
           <li>Joel Sequiera (Front-End Implementation)</li>
           <li>Xinghang Li (Back-End Implementation)</li>

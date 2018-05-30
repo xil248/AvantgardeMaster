@@ -201,7 +201,7 @@ class Sidebar extends React.Component {
     this.getPrevSession = this.getPrevSession.bind(this);
     this.getNextSession = this.getNextSession.bind(this);
     this.logout = this.logout.bind(this);
-    
+
 
     // Handle the content of filter input box
     this.state = {
@@ -274,16 +274,16 @@ class Sidebar extends React.Component {
       // var sessionObjs = this.sessionObjs;
       // console.log("changeDataset-----------------")
       // console.log(sessionObjs);
-      
+
       // var newSessionObj;
-      
+
       // if(sessionObjs.length != 0){
       //   newSessionObj = sessionObjs[this.curSessionIndex];
       // }
       // else{
       //   newSessionObj = defaultSessionObj;
       // }
-      
+
       // newSessionObj['Dataset'] = datasetOptions.value;
       // this.sessionObjs = this.props.updateSession(newSessionObj,this.props.sessionUserID);
       // if(sessionObjs.length < maxSession) {this.curSessionIndex++}
@@ -336,7 +336,7 @@ class Sidebar extends React.Component {
       this.curSessionIndex = this.curSessionIndex+1 == this.pastSessionObjs.length? -1:this.curSessionIndex+1;
       if(this.curSessionIndex==-1){
         const curSessionObj = serverApi.getCurSession(this.props.sessionUserID);
-        
+
         const features = curSessionObj['features'];
         this.props.loadAllFeatures(features);
       }
@@ -393,9 +393,9 @@ class Sidebar extends React.Component {
       serverApi.saveCurSession(this.props.sessionUserID,this.props.datasetName);
       window.location.href = '/';
     }
-  
+
   }
-  
+
   loadDataFiles(userID){
     $.ajax({
       url : "/getDataFile",
@@ -410,7 +410,7 @@ class Sidebar extends React.Component {
           console.log("loadDataFiles ~~~~");
           // var options = [{value:'',label:'Default Dataset'}];
           var options = [];
-  
+
           for (var i = 0; i < dataFiles.length; i++){
             options.push({value:dataFiles[i]['_id'], label:dataFiles[i]['fileName']});
             // fileNames.push(dataFiles[i]["fileName"]);
@@ -419,7 +419,7 @@ class Sidebar extends React.Component {
           this.setState({
             dataFileOptions : options
           });
-  
+
       }.bind(this),
       error : function(err){
           console.log("LoadDataFiles failed !");
@@ -438,7 +438,7 @@ class Sidebar extends React.Component {
   uploadModal() {
     var dataTypes = JSON.stringify(tableDataTypes);
     // var dataTypes = JSON.stringify(this.refs.table.state.data[5]);
-    
+
     var newDataFile={
       fileName : fileName,
       fileObj : rawDataJSON,
@@ -446,14 +446,14 @@ class Sidebar extends React.Component {
     };
 
 
-    // var datafileID = this.props.onAddDataFile(newDataFile,this.props.sessionUserID); 
-    var fileData = serverApi.onAddDataFile(newDataFile,this.props.sessionUserID);     
+    // var datafileID = this.props.onAddDataFile(newDataFile,this.props.sessionUserID);
+    var fileData = serverApi.onAddDataFile(newDataFile,this.props.sessionUserID);
     var newSessObj = defaultCurSessionObj;
     newSessObj['dataFileID'] = fileData['id'];
     this.props.updateCurSession(newSessObj,this.props.sessionUserID);
     this.changeDataset({value:fileData['id'], label:fileData['name']});
 
-    // this.loadDataFiles(this.props.sessionUserID);   
+    // this.loadDataFiles(this.props.sessionUserID);
     // this.setState({modalIsOpen: false});
     // this.setState({zipcodeField : ""});
     // this.setState({dateField : ""});
@@ -485,23 +485,23 @@ class Sidebar extends React.Component {
       this.props.removeFeature(featureName);
     }
 
-       
+
     // var sessionObjs = this.sessionObjs;
     // console.log("handleFeature-----------------")
     // console.log(sessionObjs);
-    
+
     // var newSessionObj;
 
     // // if (curSessionIndex == -1) curSessionIndex = sessionObjs.length - 1;
     // console.log(this.curSessionIndex);
-    
+
     // if(sessionObjs.length != 0){
     //   newSessionObj = sessionObjs[this.curSessionIndex];
     // }
     // else{
     //   newSessionObj = defaultSessionObj;
     // }
-    
+
     // if (checked) {
     //   newSessionObj['Features'].push(featureName);
     //   this.sessionObjs = this.props.updateSession(newSessionObj,this.props.sessionUserID);
@@ -511,7 +511,7 @@ class Sidebar extends React.Component {
     // }
     // else{
     //   for (var i = 0; i < newSessionObj['Features'].length; i++ ){
-        
+
     //     if(newSessionObj['Features'][i] == featureName){
     //       newSessionObj['Features'].splice(i, 1);
     //       this.sessionObjs = this.props.updateSession(newSessionObj,this.props.sessionUserID);
@@ -548,16 +548,16 @@ class Sidebar extends React.Component {
    * Function that convert csv to json and store it in localStorage.
    */
   // Feature test
-  uploadFile = files => {
-      
+  uploadFile(files) {
+
       var reader = new FileReader();
       reader.onload = function(e) {
       // Use reader.result
-      
+
       fileName = files[0].name;
-      rawDataJSON = DataUtils.csvJSON(reader.result); 
+      rawDataJSON = DataUtils.csvJSON(reader.result);
       rawData = JSON.parse(rawDataJSON)
-      
+
       tableData = [];
       fieldNames = ['ID'];
 
@@ -565,7 +565,7 @@ class Sidebar extends React.Component {
       var totalNumRow = 5;
       var countFilled = 0;
       var maxFilled;
-      // Read all column names of the input csv file. 
+      // Read all column names of the input csv file.
       try{
         maxFilled = rawData[0].length;
         for(name in rawData[0] ){
@@ -573,7 +573,7 @@ class Sidebar extends React.Component {
           var tmpName = name.toLowerCase();
           var zipType = "zip";
           var dateType = "date";
-          
+
           fieldNames.push(name);
           tableDataTypes[name] = 'N/A';
           if(  !this.state.zipcodeField   && tmpName.indexOf(zipType) !== -1 ){
@@ -585,7 +585,7 @@ class Sidebar extends React.Component {
             // this.setState({dateField : {value:name, label:name}});
           }
 
-          
+
           nullValRow[name] = 0;
         }
       }
@@ -614,7 +614,7 @@ class Sidebar extends React.Component {
               countFilled += 1;
               pos += 1
             }
-          } 
+          }
         }
       }
 
@@ -735,10 +735,10 @@ class Sidebar extends React.Component {
     //Here is your answer
     console.log(this.refs.table.state.data[5]);
   }
-  
+
   render() {
     // Only render if there is data
-    
+
     if (!this.props.data || this.props.data.length <= 0) {
       return (
         <div>
@@ -759,13 +759,13 @@ class Sidebar extends React.Component {
             options={this.state.dataFileOptions}
             onChange={this.changeDataset}
             clearable={false}
-          />   
+          />
           {/* <ButtonToolbar> */}
             <ReactFileReader handleFiles={this.uploadFile} fileTypes={'.csv'}>
               <Button bsStyle="danger" bsSize="small">
                 Upload CSV File
               </Button>
-            </ReactFileReader>   
+            </ReactFileReader>
           <Button bsStyle="primary" bsSize="small" onClick={this.getPrevSession}> Previous Session </Button>
           <Button bsStyle="primary" bsSize="small" onClick={this.getNextSession}> Next Session </Button>
           <div>
@@ -787,25 +787,25 @@ class Sidebar extends React.Component {
               <h4>Please select a column name for zipcode</h4>
               <div className="ag-sidebar--select">
                 <Select
-                  value = {this.state.zipcodeField} 
+                  value = {this.state.zipcodeField}
                   options={fieldOptions}
                   onChange={this.changeZipcodeField}
-                /> 
+                />
               </div><br></br>
               <h4>Please select a column name for date</h4>
               <div className="ag-sidebar--select">
                 <Select
-                  value = {this.state.dateField} 
+                  value = {this.state.dateField}
                   options={fieldOptions}
                   onChange={this.changeDateField}
-                /> 
+                />
               </div><br></br>
               <br></br>
               <ButtonToolbar>
-                <Button onClick={this.uploadModal}>OK</Button> 
-                <Button onClick={this.closeModal}>Cancel</Button>  
+                <Button onClick={this.uploadModal}>OK</Button>
+                <Button onClick={this.closeModal}>Cancel</Button>
               </ButtonToolbar>
-    
+
             </Modal>
           </div>
           <h3 className="ag-sidebar--title">Filters</h3>

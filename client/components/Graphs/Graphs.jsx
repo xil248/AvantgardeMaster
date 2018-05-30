@@ -5,17 +5,18 @@ import { connect } from 'react-redux';
 import {
   FILTER_CATEGORICAL,
   FILTER_CONTINUOUS,
-  // FILTER_BUCKETED,
+  FILTER_BUCKETED,
 } from '../../filtering/filterTypes';
-// import BarChart3 from './BarChart3';
-import BarChart2 from './BarChart2';
-import BarChart1 from './BarChart1';
+import ContinuousBarChart from './ContinuousBarChart';
+import Filter from '../../filtering/index';
+import DiscreteBarChart from './DiscreteBarChart';
+// import BarChart2 from './BarChart2';
 import Confidence from '../Filters/Confidence';
 import * as actions from '../../actions/index';
 import DataUtils from '../../utils/dataUtils';
 // import {
-//   gradBins as GradBins,
-// } from './BarChart/model/gradBins';
+//   DiscreteBinUtil,
+// } from '../../utils/binUtils';
 
 const propTypes = {
   /**
@@ -32,7 +33,7 @@ const propTypes = {
   /**
    * Array of filters from Redux state
    */
-  // filters: PropTypes.array,
+  filters: PropTypes.array,
 
   /**
    * Action creator to apply brushing
@@ -72,77 +73,22 @@ const defaultProps = {
  * @extends {React.Component}
  */
 class Graphs extends React.Component {
-  /**
-   * Returns the absolute 'position' of the chart container element.
-   * Used to place tooltips
-   */
-  // static findContainerDims(el, cls = 'ag-chart--container') {
-  //   let currEl = el;
-  //   while (!currEl.classList.contains(cls)) {
-  //     currEl = currEl.parentElement;
-  //   }
-
-  //   return currEl.getBoundingClientRect();
-  // }
 
   constructor(props) {
     super(props);
-
     this.renderGraphs = this.renderGraphs.bind(this);
-    // this.mouseOverHandler = this.mouseOverHandler.bind(this);
-    // this.mouseOutHandler = this.mouseOutHandler.bind(this);
-
-    this.state = {
-      showToolTip: false,
-    };
   }
 
-  mouseOverHandler(d, e, feature, type, bucketsHash = {}) { // eslint-disable-line
-    // Use containerDims as reference to absolutely position tooltips
-    // on the tops of bars
-    const containerDims = this.constructor.findContainerDims(e.target);
-    const rectDims = e.target.getBoundingClientRect();
-
-    this.setState({
-      showToolTip: true,
-      ttTop: `${rectDims.top - containerDims.top - 22}px`,
-      ttLeft: `${rectDims.left - containerDims.left}px`,
-      ttWidth: `${rectDims.width}px`,
-      ttAmt: d.y,
-    });
-
-  //   if (!this.props.brush) {
-  //     const attribs = DataUtils.getFeatureAttributes(feature);
-
-  //     if (type === FILTER_CATEGORICAL) {
-  //       this.props.applyBrush(this.props.data, [{
-  //         name: feature,
-  //         type,
-  //         value: attribs.filter(attrib => attrib !== d.x),
-  //       }]);
-  //     } else if (type === FILTER_CONTINUOUS ||
-  //                type === FILTER_BUCKETED) {
-  //       // Find correct minVal and maxVal from bucketsHash
-  //       const bucket = bucketsHash[d.x];
-  //       this.props.applyBrush(this.props.data, [{
-  //         name: feature,
-  //         type,
-  //         minVal: bucket.minVal,
-  //         maxVal: bucket.maxVal,
-  //       }]);
-  //     }
-  //   }
+  componentWillMount() {
+    // data to store the filtered data
+    this.data = [];
+    // previous filters
+    this.filters = '';
   }
 
-  // mouseOutHandler() {
-  //   this.setState({
-  //     showToolTip: false,
-  //   });
-
-  //   if (this.props.brush) {
-  //     this.props.removeBrush();
-  //   }
-  // }
+  getData() {
+    return this.data;
+  }
 
   /**
    * Function to render Graphs for each feature
@@ -152,89 +98,60 @@ class Graphs extends React.Component {
    */
   renderGraphs() {
     // For each feature, render the appropriate graph
-    return Object.keys(this.props.features)
+
+    // check if filters changed
+    const filters = JSON.stringify(this.props.filters);
+    const changed = filters !== this.filters;
+
+    // update data if filters changed
+    if (changed) {
+      this.data = Filter.filtering(this.props.data, this.props.filters);
+      this.filters = filters;
+    }
+
+    const element = Object.keys(this.props.features)
       .filter(feature => this.props.features[feature])
       .map((feature) => {
         // Get the type of the filter
-        console.log(`start ${performance.now()}`);
         const type = DataUtils.getFilterType(feature);
 
-        // Get all the attributes for this particular feature (datatype: SET)
-        const attribs = DataUtils.getFeatureAttributes(feature);
-
-        let valuesKeys = [...attribs];
-        console.log(`continue ${performance.now()}`);
+        console.log(`garph ${feature} start`, performance.now());
         switch (type) {
           case FILTER_CATEGORICAL: {
-            /**
-             * Build the values object that will be used to create the data for
-             * the chart. The keys for it will be the attributes of the feature
-             * and the value for each key will be its count in the data set
-             * eg. for Sex {
-             *  'Male': 500,
-             *  'Female': 200,
-             *  'Trans': 50,
-             * };
-             */
-            valuesKeys = valuesKeys.filter(value => value.trim());
-            const values = {};
-            this.props.data.forEach((elem) => {
-              const currElemFeatureValue = elem[feature];
-              values[currElemFeatureValue] = values[currElemFeatureValue] ? values[currElemFeatureValue] + 1 : 1;
+            // get attributes to be filtered
+            let filteredTypes = [];
+            this.props.filters.forEach((e) => {
+              if (e.name === feature) {
+                filteredTypes = e.value;
+              }
             });
 
-            /**
-             * Data to pass into chart needs to look like:
-             * [
-             *   { x: 'Male', y: 500 },
-             *   { x: 'Female', y: 200 },
-             *   { x: 'Trans', y: 100 },
-             * ]
-             */
-            const data = valuesKeys.reduce((acc, curr) => {
-              return [
-                ...acc,
-                {
-                  x: curr,
-                  y: parseFloat(values[curr] || 0),
-                },
-              ];
-            }, []);
-
-            // let brushedData = [];
-
-            // if (this.props.brush) {
-            //   const brushedValues = {};
-            //   this.props.brushedData.forEach((elem) => {
-            //     const currElemFeatureValue = elem[feature];
-            //     brushedValues[currElemFeatureValue] = brushedValues[currElemFeatureValue] ?
-            //       brushedValues[currElemFeatureValue] + 1
-            //       : 1;
-            //   });
-
-            //   brushedData = valuesKeys.reduce((acc, curr) => {
-            //     return [
-            //       ...acc,
-            //       {
-            //         x: curr,
-            //         y: parseFloat(brushedValues[curr] || 0),
-            //       },
-            //     ];
-            //   }, []);
-            // }
+            // filter attributes
+            const allTypes = DataUtils.getFeatureAttributes(feature);
+            const types = allTypes.filter(e => (e && e.toString().trim()) && !filteredTypes.find(s => s === e));
 
             return (
               <div key={feature} className="ag-chart--barchart">
-                <BarChart2
+                {/* <BarChart2
                   label={feature}
-                  data={data}
+                  data={graphData}
                   width={200}
                   brush={this.props.brush}
                   brushedData={this.props.brushedData}
                   applyBrush={this.props.applyBrush}
                   removeBrush={this.props.removeBrush}
-                  // mouseOutHandler={this.mouseOutHandler}
-                  // mouseOverHandler={(d, e) => this.mouseOverHandler(d, e, feature, type)}
+                /> */}
+                <DiscreteBarChart
+                  types={types}
+                  label={feature}
+                  dataChanged={changed}
+                  width={400}
+                  height={200}
+                  brush={this.props.brush}
+                  brushedData={this.props.brushedData}
+                  applyBrush={this.props.applyBrush}
+                  removeBrush={this.props.removeBrush}
+                  getData={this.getData.bind(this)}
                 />
                 <div className="ag-chart--barchart-title text-center">
                   <Confidence feature={feature} position={'top'} />
@@ -243,19 +160,29 @@ class Graphs extends React.Component {
               </div>
             );
           }
-          // case FILTER_BUCKETED:
+          case FILTER_BUCKETED:
           case FILTER_CONTINUOUS: {
+            // Get the Number of Bins from props
+            let numOfBins = null;
+            this.props.filters.forEach((e) => {
+              if (Number.isInteger(e.numBuckets) && e.name === feature) {
+                numOfBins = e.numBuckets;
+              }
+            });
+
             return (
               <div key={feature} className="ag-chart--barchart">
-                <BarChart1
-                  // bins={bins}
-                  // data={this.props.data}
+                <ContinuousBarChart
+                  numOfBins={numOfBins}
+                  dataChanged={changed}
                   label={feature}
-                  width={200}
+                  width={400}
+                  height={200}
                   brush={this.props.brush}
                   brushedData={this.props.brushedData}
                   applyBrush={this.props.applyBrush}
                   removeBrush={this.props.removeBrush}
+                  getData={this.getData.bind(this)}
                 />
                 <div className="ag-chart--barchart-title text-center">
                   <Confidence feature={feature} />
@@ -269,27 +196,14 @@ class Graphs extends React.Component {
           }
         }
       });
+
+    return element;
   }
 
+
   render() {
-    // const { ttTop, ttLeft, showToolTip, ttWidth } = this.state;
-    // console.log(ttTop, ttLeft, ttWidth);
-    // console.log(`start render graph ${performance.now()}`);
     return (
       <div className="ag-chart--container">
-        <div className="ag-chart--tooltip-container">
-          {/* {showToolTip &&
-            <div
-              className="ag-chart--tooltip"
-              style={{
-                top: ttTop,
-                left: ttLeft,
-                width: ttWidth,
-              }}
-            >
-            </div>
-          } */}
-        </div>
         {this.renderGraphs()}
       </div>
     );
